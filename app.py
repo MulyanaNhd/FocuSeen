@@ -16,7 +16,7 @@ app.secret_key = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///focuseen.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-init_db()
+#init_db()
 
 # --- MODEL UNTUK FITUR FOCUSEEN ---
 class FocusTask(db.Model):

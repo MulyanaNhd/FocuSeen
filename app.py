@@ -1,3 +1,5 @@
+import os
+import certifi
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 from functools import wraps
 from models import * # Mengambil model lama (User, Tugas Dashboard Utama, dll)

@@ -1,0 +1,153 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Kelola Tugas{% endblock %}
+{% block page_title %}Kelola Tugas{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <h2 class="page-title">📋 Daftar Tugas</h2>
+    <button class="btn btn-primary" onclick="openModal('addTugasModal')">
+        <i class="fas fa-plus"></i> Tambah Tugas
+    </button>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Mata Kuliah</th>
+                <th>Judul Tugas</th>
+                <th>Deadline</th>
+                <th>Hari Tersisa</th>
+                <th>Status</th>
+                <th>Dibuat</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tugas in tugas_list %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>
+                    <span style="background: {{ tugas.matkul_color }}; color: white; padding: 4px 10px; border-radius: 4px; font-weight: 600;">
+                        {{ tugas.nama_matkul }}
+                    </span>
+                </td>
+                <td><strong>{{ tugas.judul }}</strong></td>
+                <td>{{ tugas.deadline.strftime('%d %b %Y') }}</td>
+                <td>
+                    {% if tugas.days_left < 0 %}
+                        <span class="badge badge-danger">Lewat {{ tugas.days_left * -1 }} hari</span>
+                    {% elif tugas.days_left <= 3 %}
+                        <span class="badge badge-warning">{{ tugas.days_left }} hari</span>
+                    {% else %}
+                        <span class="badge badge-info">{{ tugas.days_left }} hari</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if tugas.status %}
+                        <span class="badge badge-success">✓ Selesai</span>
+                    {% else %}
+                        <span class="badge badge-danger">belum</span>
+                    {% endif %}
+                </td>
+                <td>{{ tugas.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>
+                    <button class="btn btn-sm btn-info" onclick="editTugas({{ tugas.id }}, '{{ tugas.judul|e }}', {{ tugas.matkul_id }}, '{{ tugas.deadline.strftime('%Y-%m-%d') }}', {{ tugas.status|int }})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteTugas({{ tugas.id }}, '{{ tugas.judul|e }}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 40px; color: #888;">
+                    📭 Belum ada tugas. Tambahkan tugas pertama Anda!
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Tambah/Edit Tugas -->
+<div class="modal" id="addTugasModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Tambah Tugas Baru</h2>
+            <span class="close" onclick="closeModal('addTugasModal')">&times;</span>
+        </div>
+        <form id="tugasForm" method="POST">
+            <input type="hidden" id="tugasId" name="tugas_id">
+            <div class="form-group">
+                <label for="matkulId">Mata Kuliah <span style="color: var(--danger);">*</span></label>
+                <select id="matkulId" name="matkul_id" class="form-control" required>
+                    <option value="">-- Pilih Mata Kuliah --</option>
+                    {% for mk in mata_kuliah %}
+                    <option value="{{ mk.id }}">{{ mk.nama }} ({{ mk.kode }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="judul">Judul Tugas <span style="color: var(--danger);">*</span></label>
+                <input type="text" id="judul" name="judul" class="form-control" placeholder="Contoh: Tugas Praktikum Minggu 5" required>
+            </div>
+            <div class="form-group">
+                <label for="deadline">Deadline <span style="color: var(--danger);">*</span></label>
+                <input type="date" id="deadline" name="deadline" class="form-control" required>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+                <button type="button" class="btn btn-danger" onclick="closeModal('addTugasModal')" style="flex: 1;">
+                    <i class="fas fa-times"></i> Batal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'block';
+    document.getElementById('modalTitle').textContent = 'Tambah Tugas Baru';
+    document.getElementById('tugasForm').action = '{{ url_for("admin_add_tugas") }}';
+    document.getElementById('tugasId').value = '';
+    document.getElementById('tugasForm').reset();
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function editTugas(id, judul, matkulId, deadline, status) {
+    openModal('addTugasModal');
+    document.getElementById('modalTitle').textContent = 'Edit Tugas';
+    document.getElementById('tugasForm').action = '{{ url_for("admin_edit_tugas", tugas_id=0) }}'.replace('0', id);
+    document.getElementById('tugasId').value = id;
+    document.getElementById('judul').value = judul;
+    document.getElementById('matkulId').value = matkulId;
+    document.getElementById('deadline').value = deadline;
+}
+
+function deleteTugas(id, judul) {
+    if (confirm(`Hapus tugas "${judul}"?\n\nTindakan ini tidak dapat dibatalkan!`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("admin_delete_tugas", tugas_id=0) }}'.replace('0', id);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

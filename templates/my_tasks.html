@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Tugas Saya - focuSeen{% endblock %}
+{% block content %}
+<main class="content">
+    <section class="section">
+        <div class="section-header">
+            <h1 class="section-title">Tugas Saya</h1>
+        </div>
+        {% if user_tugas %}
+            <div class="deadline-row">
+                {% for tugas in user_tugas %}
+                <article class="deadline-card {% if tugas.status == 'completed' %}done{% endif %}">
+                    <div class="deadline-matkul" style="color: {{ tugas.matkul_color }};">{{ tugas.matkul_nama }}</div>
+                    <h2 class="deadline-title">{{ tugas.judul }}</h2>
+                    <p>Deadline: {{ tugas.deadline.strftime('%d %b %Y') }}</p>
+                    <p>Status: {{ tugas.status|title }}{% if tugas.bookmarked %} · Tersimpan{% endif %}</p>
+                    <p>Progress: {{ tugas.progress_percentage }}%</p>
+                    {% if tugas.notes %}<p>{{ tugas.notes }}</p>{% endif %}
+                </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Belum ada tugas yang ditambahkan ke daftar kamu.</p>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

@@ -1,0 +1,1064 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #0A3323;
+    --primary-dark: #105666;
+    --secondary: #839958;
+    --accent: #d3968c;
+    --bg-light: #f7f4d5;
+    --bg-dark: #0A3323;
+    --text-dark: #0A3323;
+    --text-light: #f7f4d5;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg-light);
+    color: var(--text-dark);
+    overflow-x: hidden;
+}
+
+/* Navbar */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 20px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(10,51,35,0.95);
+    z-index: 1000;
+    transition: background 0.3s;
+    border-bottom: 1px solid rgba(131,153,88,0.3);
+    backdrop-filter: blur(10px);
+}
+
+.navbar.scrolled {
+    background: rgba(10,51,35,0.98);
+}
+
+.logo {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: 3px;
+}
+
+.navbar-right {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.nav-links a {
+    color: #e8e4d6;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.3s;
+    letter-spacing: 0.5px;
+    position: relative;
+}
+
+.nav-links a:hover {
+    color: var(--accent);
+}
+
+.nav-links a.active {
+    color: var(--accent);
+}
+
+/* Logo ULBI */
+.user-profile {
+    position: relative;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s;
+    border: 2px solid var(--accent);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.user-avatar:hover {
+    transform: scale(1.1);
+}
+
+/* Dropdown ULBI */
+.dropdown-menu {
+    position: absolute;
+    top: 65px;
+    right: 0;
+    width: 380px;
+    background: rgba(10,51,35,0.98);
+    border: 2px solid var(--secondary);
+    border-radius: 8px;
+    padding: 25px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px);
+}
+
+.user-profile:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-title {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(139,115,85,0.3);
+}
+
+.dropdown-section {
+    margin-bottom: 18px;
+}
+
+.dropdown-subtitle {
+    font-weight: 600;
+    font-size: 13px;
+    color: #e8e4d6;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dropdown-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #d4cfc0;
+    font-weight: 300;
+}
+
+.dropdown-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.dropdown-list li {
+    font-size: 12px;
+    line-height: 1.8;
+    color: #d4cfc0;
+    padding-left: 15px;
+    position: relative;
+    font-weight: 300;
+}
+
+.dropdown-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+}
+
+/* Dropdown Tim */
+.tim-dropdown {
+    position: fixed;
+    top: 80px;
+    right: 50px;
+    background: rgba(10,51,35,0.98);
+    border: 2px solid var(--secondary);
+    border-radius: 8px;
+    padding: 15px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px);
+    z-index: 999;
+}
+
+.tim-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.tim-member {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    color: #e8e4d6;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s;
+    margin-bottom: 8px;
+}
+
+.tim-member:last-child {
+    margin-bottom: 0;
+}
+
+.tim-member:hover {
+    background: rgba(131,153,88,0.3);
+    color: var(--accent);
+}
+
+.tim-member .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--secondary);
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+/* new class for real image avatars */
+.avatar-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--secondary);
+    transition: transform 0.3s;
+}
+
+.avatar-img:hover {
+    transform: scale(1.1);
+}
+
+.tim-member span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Hero Section */
+.hero {
+    min-height: 70vh;
+    background: linear-gradient(135deg, var(--bg-light) 0%, #e6e2c5 100%);
+    display: flex;
+    align-items: center;
+    padding: 120px 50px 50px;
+    position: relative;
+}
+
+.hero::before {
+    content: '🎓';
+    position: absolute;
+    font-size: 280px;
+    opacity: 0.05;
+    right: 10%;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.hero-content {
+    max-width: 800px;
+    z-index: 2;
+}
+
+.hero-content h1 {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 72px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    color: var(--primary);
+    letter-spacing: -1px;
+    line-height: 1;
+}
+
+.hero-subtitle {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 20px;
+    color: var(--secondary);
+    margin-bottom: 20px;
+    letter-spacing: 3px;
+    font-weight: 600;
+}
+
+.hero-content p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--primary);
+    margin-bottom: 25px;
+    font-weight: 300;
+}
+
+.hero-date {
+    font-size: 14px;
+    color: var(--secondary);
+    margin-bottom: 30px;
+    font-style: italic;
+    font-weight: 300;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 50px;
+    margin-bottom: 35px;
+}
+
+.hero-stat-value {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: #105666;
+}
+
+.hero-stat-label {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 11px;
+    color: var(--secondary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 5px;
+    font-weight: 600;
+}
+
+.btn {
+    padding: 14px 30px;
+    border: 2px solid var(--primary);
+    border-radius: 6px;
+    font-family: 'League Spartan', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+    text-decoration: none;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-right: 15px;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: var(--bg-light);
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--primary);
+}
+
+.btn-secondary:hover {
+    background: rgba(92, 64, 51, 0.1);
+}
+
+/* Content */
+.content {
+    padding: 50px 50px;
+    background: var(--bg-light);
+}
+
+.section {
+    margin-bottom: 60px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.section-title {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.btn-add {
+    padding: 10px 20px;
+    background: var(--primary);
+    color: var(--bg-light);
+    border: none;
+    border-radius: 6px;
+    font-family: 'League Spartan', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-add:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* Deadline Cards */
+.deadline-row {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 15px;
+}
+
+.deadline-card {
+    min-width: 320px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    border: 2px solid #e6e2c5;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s;
+}
+
+.deadline-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.deadline-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: var(--secondary);
+    border-radius: 12px 0 0 12px;
+}
+
+.deadline-card.urgent::before {
+    background: var(--accent);
+}
+
+.deadline-card.done {
+    opacity: 0.6;
+}
+
+.delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(220, 38, 38, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.delete-btn:hover {
+    background: rgb(220, 38, 38);
+}
+
+.deadline-matkul {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 11px;
+    color: var(--secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.deadline-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--text-dark);
+}
+
+.deadline-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--secondary);
+    margin-bottom: 12px;
+}
+
+.countdown-badge {
+    background: var(--secondary);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+}
+
+.countdown-badge.urgent {
+    background: var(--accent);
+}
+
+.done-badge {
+    background: #7a9d54;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+}
+
+.toggle-status-btn {
+    width: 100%;
+    padding: 8px;
+    background: rgba(10, 51, 35, 0.1);
+    border: 1px solid var(--secondary);
+    border-radius: 6px;
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.toggle-status-btn:hover {
+    background: rgba(10, 51, 35, 0.2);
+}
+
+/* Mata Kuliah */
+.matkul-row {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 15px;
+}
+
+.matkul-card {
+    min-width: 280px;
+    height: 170px;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s;
+    text-decoration: none;
+    border: 2px solid #e6e2c5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.matkul-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* overlay tuned to rosy-brown (#c49088) for consistent card tone */
+    background: linear-gradient(to bottom, transparent 0%, rgba(196,144,136,0.55) 100%);
+    z-index: 1;
+}
+
+.matkul-card:hover {
+    transform: translateY(-4px);
+}
+
+.matkul-bg {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #fff;
+    /* thin gradient: dominant moss green (#839958) with a subtle rosy-brown tip (#d3968c) */
+    background: linear-gradient(180deg,
+        rgba(131,153,88,0.96) 0%,
+        rgba(131,153,88,0.96) 86%,
+        rgba(211,150,140,0.14) 100%
+    );
+}
+
+.matkul-content {
+    position: absolute;
+    bottom: 18px;
+    left: 18px;
+    right: 18px;
+    z-index: 2;
+}
+
+.matkul-name {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #fff;
+}
+
+.matkul-meta {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 51, 35, 0.95);
+}
+
+.modal-content {
+    background: #fff;
+    margin: 10% auto;
+    padding: 35px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 32px;
+    color: var(--secondary);
+    cursor: pointer;
+}
+
+.modal-content h2 {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 28px;
+    color: var(--primary);
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-family: 'League Spartan', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e6e2c5;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--secondary);
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 15px 20px;
+    }
+    .hero {
+        padding: 100px 20px 40px;
+    }
+    .hero-content h1 {
+        font-size: 42px;
+    }
+    .content {
+        padding: 30px 20px;
+    }
+}
+
+/* ========================================
+   USER AUTHENTICATION STYLES
+   ======================================== */
+
+.btn-login {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #105666 0%, #839958 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-family: 'League Spartan', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(10, 51, 35, 0.3);
+}
+
+/* ========================================
+   USER MENU & NOTIFICATIONS
+   ======================================== */
+
+.user-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.notification-bell {
+    position: relative;
+    cursor: pointer;
+    font-size: 20px;
+    color: #e8e4d6;
+    transition: color 0.3s;
+}
+
+.notification-bell:hover {
+    color: var(--accent);
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #dc3545;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 45px;
+    right: 0;
+    width: 350px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s;
+    z-index: 1000;
+}
+
+.notification-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.notification-header {
+    background: linear-gradient(135deg, #105666 0%, #839958 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-title {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.notification-count {
+    background: rgba(255,255,255,0.2);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.notification-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.notification-item:hover {
+    background: #f8f9fa;
+}
+
+.notification-item.unread {
+    background: rgba(139, 115, 85, 0.05);
+    border-left: 4px solid var(--secondary);
+}
+
+.notification-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.notification-icon i {
+    font-size: 18px;
+    color: #839958;
+}
+
+.notification-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-message {
+    font-size: 14px;
+    color: #2d2416;
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.notification-time {
+    font-size: 12px;
+    color: #888;
+}
+
+.notification-dot {
+    width: 8px;
+    height: 8px;
+    background: #dc3545;
+    border-radius: 50%;
+    margin-top: 8px;
+    flex-shrink: 0;
+}
+
+.notification-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888;
+}
+
+.notification-empty i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.3;
+}
+
+/* ========================================
+   USER DROPDOWN
+   ======================================== */
+
+.user-dropdown {
+    position: absolute;
+    top: 45px;
+    right: 0;
+    width: 280px;
+    background: rgba(10,51,35,0.98);
+    border: 2px solid var(--secondary);
+    border-radius: 12px;
+    padding: 15px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s;
+    backdrop-filter: blur(10px);
+    z-index: 999;
+}
+
+.user-menu:hover .user-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    background: rgba(131,153,88,0.2);
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.user-avatar-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.username {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 3px;
+}
+
+.user-email {
+    font-size: 12px;
+    color: #e8e4d6;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    color: #e8e4d6;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.dropdown-item:hover {
+    background: rgba(131,153,88,0.3);
+    color: var(--accent);
+    transform: translateX(5px);
+}
+
+.dropdown-item i {
+    width: 20px;
+    font-size: 16px;
+}
+
+/* ========================================
+   TOAST NOTIFICATIONS
+   ======================================== */
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    color: #2d2416;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 9999;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    animation: slideIn 0.3s forwards, slideOut 0.3s 2.7s forwards;
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast-success {
+    border-left: 4px solid #28a745;
+}
+
+.toast-error {
+    border-left: 4px solid #dc3545;
+}
+
+.toast-info {
+    border-left: 4px solid var(--secondary);
+}
+
+@keyframes slideIn {
+    from { transform: translateX(400px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(400px); opacity: 0; }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .notification-dropdown {
+        width: 300px;
+        right: 10px;
+    }
+    
+    .user-dropdown {
+        width: 250px;
+        right: 10px;
+    }
+    
+    .toast {
+        bottom: 70px;
+        right: 10px;
+        left: 10px;
+        width: calc(100% - 20px);
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+/* Style untuk tombol durasi yang aktif dipilih */
+.duration-btn {
+    transition: all 0.2s;
+    opacity: 0.6; /* Agak transparan kalau tidak dipilih */
+}
+
+.duration-btn.active {
+    opacity: 1; /* Jelas kalau dipilih */
+    transform: scale(1.05); /* Sedikit membesar */
+    border: 2px solid #2c5f6f; /* Border penegas */
+    font-weight: bold;
+}

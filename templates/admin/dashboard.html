@@ -1,0 +1,140 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card info">
+        <div class="stat-icon">
+            <i class="fas fa-tasks"></i>
+        </div>
+        <div class="stat-value">{{ stats.total_tugas }}</div>
+        <div class="stat-label">Total Tugas</div>
+    </div>
+    
+    <div class="stat-card success">
+        <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-value">{{ stats.tugas_selesai }}</div>
+        <div class="stat-label">Tugas Selesai</div>
+    </div>
+    
+    <div class="stat-card danger">
+        <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-value">{{ stats.tugas_belum }}</div>
+        <div class="stat-label">Belum Selesai</div>
+    </div>
+    
+    <div class="stat-card warning">
+        <div class="stat-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="stat-value">{{ stats.tugas_mendekati }}</div>
+        <div class="stat-label">Deadline Dekat</div>
+    </div>
+    
+    <div class="stat-card info">
+        <div class="stat-icon">
+            <i class="fas fa-book"></i>
+        </div>
+        <div class="stat-value">{{ total_matkul }}</div>
+        <div class="stat-label">Mata Kuliah</div>
+    </div>
+    
+    <div class="stat-card info">
+        <div class="stat-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-value">{{ total_anggota }}</div>
+        <div class="stat-label">Anggota Tim</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-top: 30px;">
+    <!-- Tugas Terbaru -->
+    <div class="table-container">
+        <div style="padding: 20px; background: var(--primary); color: white; font-family: 'League Spartan', sans-serif; font-weight: 700;">
+            📋 Tugas Terbaru
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Mata Kuliah</th>
+                    <th>Judul</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tugas in tugas_terbaru %}
+                <tr>
+                    <td><strong style="color: {{ tugas.matkul_color }}">{{ tugas.nama_matkul }}</strong></td>
+                    <td>{{ tugas.judul }}</td>
+                    <td>{{ tugas.deadline.strftime('%d %b %Y') }}</td>
+                    <td>
+                        {% if tugas.status %}
+                            <span class="badge badge-success">✓ Selesai</span>
+                        {% else %}
+                            <span class="badge badge-danger">belum</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('admin_tugas') }}" class="btn btn-sm btn-info">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 30px; color: #888;">
+                        Belum ada tugas
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Mata Kuliah Terbaru -->
+    <div class="table-container">
+        <div style="padding: 20px; background: var(--primary); color: white; font-family: 'League Spartan', sans-serif; font-weight: 700;">
+            📚 Mata Kuliah
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Kode</th>
+                    <th>Semester</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mk in matkul_terbaru %}
+                <tr>
+                    <td><strong>{{ mk.nama }}</strong></td>
+                    <td>{{ mk.kode }}</td>
+                    <td>{{ mk.semester }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 30px; color: #888;">
+                        Belum ada data
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div style="padding: 20px; text-align: center;">
+            <a href="{{ url_for('admin_matkul') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Kelola Mata Kuliah
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

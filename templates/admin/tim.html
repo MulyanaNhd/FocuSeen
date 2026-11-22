@@ -1,0 +1,135 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Kelola Anggota Tim{% endblock %}
+{% block page_title %}Kelola Anggota Tim{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <h2 class="page-title">👥 Daftar Anggota Tim</h2>
+    <button class="btn btn-primary" onclick="openModal('addTimModal')">
+        <i class="fas fa-plus"></i> Tambah Anggota
+    </button>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; margin-bottom: 30px;">
+    {% for anggota in anggota_tim %}
+    <div style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 2px solid var(--secondary);">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="width: 100px; height: 100px; border-radius: 50%; background: var(--accent); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                👨
+            </div>
+            <h3 style="font-family: 'League Spartan', sans-serif; color: var(--primary); margin-bottom: 5px;">{{ anggota.nama }}</h3>
+            <span class="badge badge-info">{{ anggota.peran }}</span>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <i class="fas fa-id-card" style="color: var(--secondary); margin-right: 10px;"></i>
+                <span><strong>NIM:</strong> {{ anggota.nim }}</span>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <i class="fas fa-envelope" style="color: var(--secondary); margin-right: 10px;"></i>
+                <span style="font-size: 13px; word-break: break-all;">{{ anggota.email }}</span>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-sm btn-info" style="flex: 1;" onclick="editTim({{ anggota.id }}, '{{ anggota.nama|e }}', '{{ anggota.nim }}', '{{ anggota.email }}', '{{ anggota.peran|e }}')">
+                <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn btn-sm btn-danger" style="flex: 1;" onclick="deleteTim({{ anggota.id }}, '{{ anggota.nama|e }}')">
+                <i class="fas fa-trash"></i> Hapus
+            </button>
+        </div>
+    </div>
+    {% else %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 60px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <i class="fas fa-users-slash" style="font-size: 64px; color: #ddd; margin-bottom: 20px;"></i>
+        <p style="font-size: 18px; color: #888;">Belum ada anggota tim</p>
+        <button class="btn btn-primary" onclick="openModal('addTimModal')" style="margin-top: 20px;">
+            <i class="fas fa-plus"></i> Tambah Anggota Pertama
+        </button>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal Tambah/Edit Anggota Tim -->
+<div class="modal" id="addTimModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitleTim">Tambah Anggota Tim</h2>
+            <span class="close" onclick="closeModal('addTimModal')">&times;</span>
+        </div>
+        <form id="timForm" method="POST">
+            <input type="hidden" id="timId" name="tim_id">
+            <div class="form-group">
+                <label for="namaTim">Nama Lengkap <span style="color: var(--danger);">*</span></label>
+                <input type="text" id="namaTim" name="nama" class="form-control" placeholder="Contoh: Mulyana Nurhamida" required>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label for="nim">NIM <span style="color: var(--danger);">*</span></label>
+                    <input type="text" id="nim" name="nim" class="form-control" placeholder="Contoh: 184240027" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email <span style="color: var(--danger);">*</span></label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Contoh: nama@std.ulbi.ac.id" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="peran">Peran dalam Tim <span style="color: var(--danger);">*</span></label>
+                <input type="text" id="peran" name="peran" class="form-control" placeholder="Contoh: Frontend Developer" required>
+            </div>
+            <div class="form-group">
+                <label for="foto">Foto (URL/Path)</label>
+                <input type="text" id="foto" name="foto" class="form-control" placeholder="photo.jpg" value="photo.jpg">
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+                <button type="button" class="btn btn-danger" onclick="closeModal('addTimModal')" style="flex: 1;">
+                    <i class="fas fa-times"></i> Batal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'block';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function editTim(id, nama, nim, email, peran) {
+    openModal('addTimModal');
+    document.getElementById('modalTitleTim').textContent = 'Edit Anggota Tim';
+    document.getElementById('timForm').action = '{{ url_for("admin_edit_tim", anggota_id=0) }}'.replace('0', id);
+    document.getElementById('timId').value = id;
+    document.getElementById('namaTim').value = nama;
+    document.getElementById('nim').value = nim;
+    document.getElementById('email').value = email;
+    document.getElementById('peran').value = peran;
+}
+
+function deleteTim(id, nama) {
+    if (confirm(`Hapus anggota "${nama}" dari tim?\n\nTindakan ini tidak dapat dibatalkan!`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("admin_delete_tim", anggota_id=0) }}'.replace('0', id);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

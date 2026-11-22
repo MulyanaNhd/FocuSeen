@@ -1,0 +1,158 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Kelola Mata Kuliah{% endblock %}
+{% block page_title %}Kelola Mata Kuliah{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <h2 class="page-title">📚 Daftar Mata Kuliah</h2>
+    <button class="btn btn-primary" onclick="openModal('addMatkulModal')">
+        <i class="fas fa-plus"></i> Tambah Mata Kuliah
+    </button>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Kode</th>
+                <th>Nama Mata Kuliah</th>
+                <th>Dosen Pengampu</th>
+                <th>Semester</th>
+                <th>Warna</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mk in mata_kuliah %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td><code>{{ mk.kode }}</code></td>
+                <td>
+                    <strong>{{ mk.nama }}</strong>
+                    <div style="font-size: 24px; margin-top: 5px;">{{ mk.icon }}</div>
+                </td>
+                <td>{{ mk.dosen }}</td>
+                <td>
+                    <span class="badge badge-info">Semester {{ mk.semester }}</span>
+                </td>
+                <td>
+                    <div style="display: inline-block; width: 30px; height: 30px; background: {{ mk.color }}; border-radius: 6px; border: 2px solid #ddd;"></div>
+                    <code style="font-size: 11px; color: #666; margin-left: 5px;">{{ mk.color }}</code>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-info" onclick="editMatkul({{ mk.id }}, '{{ mk.nama|e }}', '{{ mk.kode }}', '{{ mk.color }}', '{{ mk.icon }}', '{{ mk.dosen|e }}', {{ mk.semester }})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteMatkul({{ mk.id }}, '{{ mk.nama|e }}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 40px; color: #888;">
+                    📭 Belum ada data mata kuliah
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Tambah/Edit Mata Kuliah -->
+<div class="modal" id="addMatkulModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitleMatkul">Tambah Mata Kuliah</h2>
+            <span class="close" onclick="closeModal('addMatkulModal')">&times;</span>
+        </div>
+        <form id="matkulForm" method="POST">
+            <input type="hidden" id="matkulId" name="matkul_id">
+            <div class="form-group">
+                <label for="nama">Nama Mata Kuliah <span style="color: var(--danger);">*</span></label>
+                <input type="text" id="nama" name="nama" class="form-control" placeholder="Contoh: Programming I" required>
+            </div>
+            <div class="form-group">
+                <label for="kode">Kode Mata Kuliah <span style="color: var(--danger);">*</span></label>
+                <input type="text" id="kode" name="kode" class="form-control" placeholder="Contoh: MSD124000" required>
+            </div>
+            <div class="form-group">
+                <label for="dosen">Dosen Pengampu <span style="color: var(--danger);">*</span></label>
+                <input type="text" id="dosen" name="dosen" class="form-control" placeholder="Contoh: Woro Isti Rahayu, S.T., M.T." required>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label for="semester">Semester <span style="color: var(--danger);">*</span></label>
+                    <select id="semester" name="semester" class="form-control" required>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="color">Warna <span style="color: var(--danger);">*</span></label>
+                    <input type="color" id="color" name="color" class="form-control" value="#c49088" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="icon">Icon/Emoji <span style="color: var(--danger);">*</span></label>
+                <input type="text" id="icon" name="icon" class="form-control" placeholder="Contoh: 🖥️ 📊 🧮" value="📚" required>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+                <button type="button" class="btn btn-danger" onclick="closeModal('addMatkulModal')" style="flex: 1;">
+                    <i class="fas fa-times"></i> Batal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'block';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function editMatkul(id, nama, kode, color, icon, dosen, semester) {
+    openModal('addMatkulModal');
+    document.getElementById('modalTitleMatkul').textContent = 'Edit Mata Kuliah';
+    document.getElementById('matkulForm').action = '{{ url_for("admin_edit_matkul", matkul_id=0) }}'.replace('0', id);
+    document.getElementById('matkulId').value = id;
+    document.getElementById('nama').value = nama;
+    document.getElementById('kode').value = kode;
+    document.getElementById('dosen').value = dosen;
+    document.getElementById('semester').value = semester;
+    document.getElementById('color').value = color;
+    document.getElementById('icon').value = icon;
+}
+
+function deleteMatkul(id, nama) {
+    if (confirm(`Hapus mata kuliah "${nama}"?\n\nPeringatan: Pastikan tidak ada tugas yang menggunakan mata kuliah ini!`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("admin_delete_matkul", matkul_id=0) }}'.replace('0', id);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

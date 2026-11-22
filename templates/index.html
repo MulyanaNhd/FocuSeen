@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - focuSeen{% endblock %}
+{% block content %}
+
+<div class="hero">
+    <div class="hero-content">
+        <h1>Data Science Semester 3</h1>
+        <div class="hero-subtitle">KELOMPOK LYA & SAM</div>
+        <p>Kelola semua materi kuliah, tugas, dan laporan praktikum dalam satu tempat. Tetap terorganisir dan jangan lewatkan deadline!</p>
+        <div class="hero-date" id="currentDate">Loading...</div>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-value">{{ total_tugas }}</div>
+                <div class="hero-stat-label">TOTAL TUGAS</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">{{ tugas_selesai }}</div>
+                <div class="hero-stat-label">SELESAI</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">{{ mata_kuliah|length }}</div>
+                <div class="hero-stat-label">MATA KULIAH</div>
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="showAddTugasModal()">▸ TAMBAH TUGAS</button>
+        <a href="#" class="btn btn-secondary" onclick="alert('Coming Soon')">ⓘ INFO MATERI</a>
+    </div>
+</div>
+
+<div class="content">
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title" style="font-size:32px; line-height:1.1;">Deadline Terdekat</div>
+            <button class="btn-add" onclick="showAddTugasModal()">+ Tambah Tugas</button>
+        </div>
+        <div class="deadline-row">
+            {% for tugas in tugas_list %}
+            <div class="deadline-card {% if tugas.days_left <= 3 %}urgent{% endif %} {% if tugas.status %}done{% endif %}">
+                <button class="delete-btn" onclick="deleteTugas({{ tugas.id }})">✕</button>
+                <div class="deadline-matkul" style="color: {{ tugas.matkul_color }};">{{ tugas.nama_matkul }}</div>
+                <div class="deadline-title">{{ tugas.judul }}</div>
+                <div class="deadline-info">
+                    <span>📅 {{ tugas.deadline.strftime('%d %b %Y') }}</span>
+                    {% if not tugas.status %}
+                        <span class="countdown-badge {% if tugas.days_left <= 3 %}urgent{% endif %}">
+                            {{ tugas.days_left }} HARI
+                        </span>
+                    {% else %}
+                        <span class="done-badge">✓ SELESAI</span>
+                    {% endif %}
+                </div>
+                <button class="toggle-status-btn" onclick="toggleStatus({{ tugas.id }})">
+                    {% if tugas.status %} Belum Selesai{% else %} Selesai{% endif %}
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title"> Mata Kuliah Semester Ini</div>
+            <div></div>
+        </div>
+        <div class="matkul-row">
+            {% for mk in mata_kuliah %}
+            <a href="{{ mk.link if mk.link is defined else '#' }}" target="_blank" rel="noopener" class="matkul-card" style="border-color: {{ mk.color }};">
+                <div class="matkul-bg">
+                    {{ mk.icon }}
+                </div>
+                <div class="matkul-content">
+                    <div class="matkul-name">{{ mk.nama }}</div>
+                    <div class="matkul-meta">{{ mk.kode }} • {{ mk.dosen }}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Tugas -->
+<div class="modal" id="addTugasModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAddTugasModal()">&times;</span>
+        <h2>Tambah Tugas Baru</h2>
+        <form id="addTugasForm">
+            <div class="form-group">
+                <label>Mata Kuliah</label>
+                <select id="matkulId" required>
+                    <option value="">Pilih Mata Kuliah</option>
+                    {% for mk in mata_kuliah %}
+                    <option value="{{ mk.id }}">{{ mk.nama }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Judul Tugas</label>
+                <input type="text" id="judul" required>
+            </div>
+            <div class="form-group">
+                <label>Deadline</label>
+                <input type="date" id="deadline" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Tambah Tugas</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Update date
+    function updateDate() {
+        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const now = new Date();
+        const dayName = days[now.getDay()];
+        const day = now.getDate();
+        const month = months[now.getMonth()];
+        const year = now.getFullYear();
+        document.getElementById('currentDate').textContent = dayName + ', ' + day + ' ' + month + ' ' + year;
+    }
+    updateDate();
+
+    // Modal functions
+    function showAddTugasModal() {
+        document.getElementById('addTugasModal').style.display = 'block';
+    }
+    
+    function closeAddTugasModal() {
+        document.getElementById('addTugasModal').style.display = 'none';
+    }
+
+    // Add tugas
+    document.getElementById('addTugasForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const data = {
+            matkul_id: document.getElementById('matkulId').value,
+            judul: document.getElementById('judul').value,
+            deadline: document.getElementById('deadline').value
+        };
+        
+        const response = await fetch('/api/tugas', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+            location.reload();
+        }
+    });
+
+    // Delete tugas
+    async function deleteTugas(id) {
+        if (confirm('Hapus tugas ini?')) {
+            const response = await fetch('/api/tugas/' + id, {
+                method: 'DELETE'
+            });
+            if (response.ok) {
+                location.reload();
+            }
+        }
+    }
+
+    // Toggle status
+    async function toggleStatus(id) {
+        const response = await fetch('/api/tugas/' + id + '/toggle', {
+            method: 'POST'
+        });
+        if (response.ok) {
+            location.reload();
+        }
+    }
+
+    // Close modal on outside click
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}
+

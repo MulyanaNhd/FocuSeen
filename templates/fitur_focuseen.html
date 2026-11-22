@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>focuSeen - Dashboard</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* --- CUSTOM CSS (Untuk bagian yang belum pakai Tailwind) --- */
+        :root {
+            --primary-color: #2c5f6f;
+            --primary-hover: #234a56;
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --text-secondary: #666;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 50px;
+        }
+        
+        /* Header */
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 { font-size: 20px; font-weight: 700; font-style: italic; letter-spacing: 1px; }
+        .header nav a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+        .header nav a:hover { color: white; text-decoration: underline; }
+        
+        /* Layout Utama */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* Kiri 2 bagian, Kanan 1 bagian */
+            gap: 20px;
+        }
+        
+        /* Styles Lama untuk Task & Schedule (Tetap dipertahankan) */
+        .tasks-section, .quick-actions, .schedule-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        /* Buttons Custom */
+        .add-task-btn {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+        }
+        .add-task-btn:hover { background-color: var(--primary-hover); }
+
+        .action-btn {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+            background-color: var(--primary-color); color: white;
+        }
+
+        /* Task Item Styles */
+        .task-item {
+            border-left: 4px solid #ddd;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: #fafafa;
+            transition: all 0.2s;
+        }
+        .task-item.overdue { border-left-color: #d9a5a5; background: #fff5f5; }
+        .task-item.warning { border-left-color: #e8d08f; background: #fffdf5; }
+        .task-item.completed { border-left-color: #8bc34a; background: #f7fbf4; opacity: 0.8; }
+        
+        .task-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .task-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary-color); }
+        .task-title { flex-grow: 1; font-weight: 500; color: #333; }
+        .task-completed .task-title { text-decoration: line-through; color: #999; }
+        
+        .task-deadline { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .deadline-overdue { background: #ffe0e0; color: #c74444; }
+        .deadline-warning { background: #fff4d6; color: #b8860b; }
+        .deadline-success { background: #d4edda; color: #28a745; }
+        
+        /* Progress Bar */
+        .task-progress { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .progress-bar-container { flex-grow: 1; height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden; }
+        .progress-bar { height: 100%; background: #6b9d7b; border-radius: 4px; transition: width 0.3s ease; }
+        .progress-percentage { font-size: 13px; font-weight: bold; color: #666; width: 40px; text-align: right; }
+        
+        .progress-controls { display: flex; gap: 8px; justify-content: flex-end; }
+        .progress-btn, .delete-btn { padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
+        .progress-btn { border: 1px solid #ddd; background: white; color: #555; }
+        .delete-btn { border: none; background: #fff0f0; color: #dc3545; }
+
+        /* Form Styles */
+        .form-container { display: none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e9ecef; }
+        .form-container.active { display: block; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
+        .form-input { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 6px; }
+        .form-actions { display: flex; gap: 10px; }
+        .btn-submit { flex: 1; padding: 10px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-cancel { flex: 1; padding: 10px; background: #e2e6ea; color: #495057; border: none; border-radius: 8px; cursor: pointer; }
+
+        /* Schedule Item */
+        .schedule-item { position: relative; border-left: 3px solid var(--primary-color); padding: 15px; margin-bottom: 10px; background: #fafafa; border-radius: 4px; }
+        .schedule-date { font-size: 11px; color: #555; margin-bottom: 6px; }
+        .schedule-time { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; }
+        .schedule-title { font-size: 14px; font-weight: 600; color: var(--primary-color); margin-bottom: 4px; }
+        .schedule-location { font-size: 12px; color: #888; display: flex; align-items: center; gap: 5px; }
+        .delete-schedule-form { position: absolute; top: 8px; right: 8px; }
+        .delete-schedule-btn { background: transparent; border: none; color: #dc3545; font-weight: bold; cursor: pointer; font-size: 16px; line-height: 1; }
+        .empty-state { text-align: center; padding: 30px 10px; color: #999; font-size: 14px; font-style: italic; }
+
+        /* TIMER MODAL Custom Styles (Campuran Tailwind & CSS Biasa) */
+        .timer-modal {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.8); /* Slate-900 opacity */
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            justify-content: center; align-items: center;
+        }
+        .timer-display {
+            font-family: 'Constantia', monospace; 
+            font-variant-numeric: tabular-nums;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .main-content { grid-template-columns: 1fr; padding: 0 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i>focuSeen</i></h1>
+        <nav>
+            <a href="/">Dashboard</a>
+        </nav>
+    </div>
+    
+    <div class="max-w-[1400px] mx-auto px-6 mt-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 w-full">
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative h-40 flex flex-col justify-center overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+                <p class="text-slate-500 font-medium text-sm mb-1 z-10 relative">Total Fokus</p>
+                <h3 class="text-5xl font-extrabold text-slate-800 z-10 relative leading-tight">
+                    {{ stats.focus_time }} </h3>
+                <div class="absolute -bottom-4 -right-4 select-none">
+                    <span class="text-8xl grayscale opacity-[0.15]">⏱️</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative h-40 flex flex-col justify-center overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+                <p class="text-slate-500 font-medium text-sm mb-1 z-10 relative">Sesi Selesai</p>
+                <h3 class="text-5xl font-extrabold text-emerald-600 z-10 relative leading-tight">
+                    {{ stats.session_count }}
+                </h3>
+                <div class="absolute -bottom-4 -right-4 select-none">
+                    <span class="text-8xl text-emerald-600 opacity-[0.2]">✅</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative h-40 flex flex-col justify-center overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+                <p class="text-slate-500 font-medium text-sm mb-1 z-10 relative">Tasks Done</p>
+                <h3 class="text-5xl font-extrabold text-slate-800 z-10 relative leading-tight">
+                    {{ stats.tasks_completed }}
+                </h3>
+                <div class="absolute -bottom-4 -right-2 select-none">
+                    <span class="text-8xl opacity-[0.2]">📝</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative h-40 flex flex-col justify-center overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+                <p class="text-slate-500 font-medium text-sm mb-1 z-10 relative">Daily Streak</p>
+                <h3 class="text-5xl font-extrabold text-orange-500 z-10 relative leading-tight">
+                    {{ stats.streak }}
+                </h3>
+                <div class="absolute -bottom-4 -right-4 select-none">
+                    <span class="text-8xl opacity-[0.25]">🔥</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="tasks-section">
+            <div class="section-title">
+                <span class="section-icon">📊</span>
+                Task Hari Ini
+            </div>
+            
+            <button class="add-task-btn" onclick="toggleForm('taskForm')">+ Tambah Task Baru</button>
+
+            <form method="POST" action="/add_task" id="taskForm" class="form-container">
+                <div class="form-group">
+                    <label class="form-label">Judul Task</label>
+                    <input type="text" name="title" class="form-input" placeholder="Masukkan judul task..." required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Deadline (hari dari sekarang)</label>
+                    <input type="number" name="deadline_days" class="form-input" placeholder="Contoh: 2" min="0" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Simpan Task</button>
+                    <button type="button" class="btn-cancel" onclick="toggleForm('taskForm')">Batal</button>
+                </div>
+            </form>
+            
+            {% if tasks %}
+                {% for task in tasks %}
+                <div class="task-item {% if task.is_completed %}completed{% elif task.deadline_days <= 2 %}overdue{% elif task.deadline_days <= 5 %}warning{% endif %}">
+                    <div class="task-header">
+                        <form method="GET" action="/toggle_task/{{ task.id }}" style="display: inline;">
+                            <input type="checkbox" class="task-checkbox" {% if task.is_completed %}checked{% endif %} onchange="this.form.submit()">
+                        </form>
+                        <span class="task-title">{{ task.title }}</span>
+                        <span class="task-deadline {% if task.deadline_days <= 2 %}deadline-overdue{% elif task.deadline_days <= 5 %}deadline-warning{% else %}deadline-success{% endif %}">
+                            {% if task.is_completed %}
+                            Selesai
+                            {% else %}
+                                {% if task.deadline_days == 0 %}Hari ini!{% else %}{{ task.deadline_days }} hari lagi{% endif %}
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="task-progress">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: {{ task.progress }}%"></div>
+                        </div>
+                        <div class="progress-percentage">{{ task.progress }}%</div>
+                    </div>
+                    
+                    <div class="progress-controls">
+                        {% if not task.is_completed %}
+                        <form method="POST" action="/update_progress/{{ task.id }}" style="display: inline;">
+                            <input type="hidden" name="progress" value="{{ task.progress + 10 }}">
+                            <button type="submit" class="progress-btn" {% if task.progress >= 100 %}disabled{% endif %}>+10%</button>
+                        </form>
+                        <form method="POST" action="/update_progress/{{ task.id }}" style="display: inline;">
+                            <input type="hidden" name="progress" value="{{ task.progress - 10 }}">
+                            <button type="submit" class="progress-btn" {% if task.progress <= 0 %}disabled{% endif %}>-10%</button>
+                        </form>
+                        {% endif %}
+                        <form method="GET" action="/delete_task/{{ task.id }}" style="display: inline;" onsubmit="return confirm('Hapus task ini?');">
+                            <button type="submit" class="delete-btn">Hapus</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>Belum ada task aktif. Yuk mulai produktif! 🚀</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="sidebar">
+            <div class="quick-actions">
+                <div class="section-title">
+                    <span class="section-icon">🎯</span>
+                    Quick Actions
+                </div>
+                <button onclick="openTimerModal()" class="action-btn btn-primary" style="margin-bottom: 0;">
+                    <span>⏱️</span> Start (Timer)
+                </button>
+            </div>
+            
+            <div class="schedule-section">
+                <div class="section-title">
+                    <span class="section-icon">📅</span>
+                    Jadwal
+                </div>
+                
+                <button class="action-btn btn-primary" onclick="toggleForm('scheduleForm')" style="margin-bottom: 15px; font-size: 13px; background-color: #f8f9fa; color: var(--primary-color); border: 1px dashed var(--primary-color);">
+                    + Tambah Jadwal
+                </button>
+
+                <form method="POST" action="/add_schedule" id="scheduleForm" class="form-container">
+                    <div class="form-group">
+                        <label class="form-label">Tanggal</label>
+                        <input type="date" name="date" class="form-input" value="{{ today.isoformat() }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Judul</label>
+                        <input type="text" name="title" class="form-input" placeholder="Matkul / Kegiatan" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Lokasi</label>
+                        <input type="text" name="location" class="form-input" placeholder="Ruang / Zoom" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div class="form-group">
+                            <label class="form-label">Mulai</label>
+                            <input type="time" name="start_time" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Selesai</label>
+                            <input type="time" name="end_time" class="form-input" required>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">Simpan</button>
+                        <button type="button" class="btn-cancel" onclick="toggleForm('scheduleForm')">Batal</button>
+                    </div>
+                </form>
+                
+                {% if schedules %}
+                    {% for schedule in schedules %}
+                    <div class="schedule-item">
+                        <form method="GET" action="/delete_schedule/{{ schedule.id }}" class="delete-schedule-form" onsubmit="return confirm('Hapus jadwal ini?');">
+                            <button type="submit" class="delete-schedule-btn">&times;</button>
+                        </form>
+                        <div class="schedule-date">{{ schedule.date.strftime('%Y-%m-%d') }}</div>
+                        <div class="schedule-time">{{ schedule.start_time }} - {{ schedule.end_time }}</div>
+                        <div class="schedule-title">📘 {{ schedule.title }}</div>
+                        <div class="schedule-location">📍 {{ schedule.location }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">Tidak ada jadwal terdaftar.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div id="pomodoroModal" class="timer-modal">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl transform transition-all scale-100">
+            
+            <div class="mb-2 flex items-center justify-center gap-2">
+                <span id="modeIcon" class="text-2xl">🔥</span>
+                <h2 id="modeTitle" class="text-2xl font-bold text-slate-800">Focus Mode</h2>
+            </div>
+            <p id="modeSubtitle" class="text-slate-500 mb-6 font-medium text-sm">Tetap fokus, jauhkan gangguan.</p>
+
+            <div id="timerDisplay" class="timer-display text-[9rem] font-bold text-slate-700 leading-none mb-8 tracking-tight">
+                25:00
+            </div>
+
+            <div class="flex justify-center gap-2 mb-8">
+                <button id="btn25" onclick="setDuration(25)" class="px-5 py-2 rounded-xl text-sm font-bold border transition-colors bg-slate-600 text-white border-slate-600">
+                    25m
+                </button>
+                <button id="btn50" onclick="setDuration(50)" class="px-5 py-2 rounded-xl text-sm font-bold border transition-colors bg-white text-slate-500 border-slate-200 hover:bg-slate-50">
+                    50m
+                </button>
+                <button id="btn5" onclick="setDuration(5)" class="px-5 py-2 rounded-xl text-sm font-bold border transition-colors bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200">
+                    5m (Istirahat)
+                </button>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <button id="btnStart" onclick="startTimer()" class="w-full py-4 rounded-xl font-bold text-lg text-white mb-2 bg-slate-700 hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200">
+                    ▶ Start
+                </button>
+                <button id="btnStop" onclick="stopTimer()" style="display: none;" class="w-full py-4 rounded-xl font-bold text-lg text-white mb-2 bg-red-500 hover:bg-red-600 transition-colors shadow-lg shadow-red-200">
+                    ⏹ Stop
+                </button>
+            </div>
+
+            <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 font-medium text-sm underline decoration-slate-300 underline-offset-4 mt-4">
+                Tutup Window
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // Toggle Form Visibility
+        function toggleForm(formId) {
+            const form = document.getElementById(formId);
+            if (form.classList.contains('active')) {
+                form.classList.remove('active');
+            } else {
+                document.querySelectorAll('.form-container').forEach(f => f.classList.remove('active'));
+                form.classList.add('active');
+            }
+        }
+
+        // --- TIMER LOGIC UPDATED ---
+        let timerInterval;
+        let initialDuration = 25; 
+        let totalSeconds = 25 * 60;
+        let isRunning = false;
+        const alarmSound = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+
+        function openTimerModal() {
+            document.getElementById('pomodoroModal').style.display = 'flex';
+            // Default 25 menit saat dibuka
+            setDuration(25);
+        }
+        
+        function closeModal() {
+            if (isRunning) {
+                if(!confirm("Timer sedang berjalan. Yakin ingin berhenti?")) return;
+            }
+            stopTimer();
+            document.getElementById('pomodoroModal').style.display = 'none';
+        }
+
+        // FUNGSI UTAMA: Ganti Mode (Fokus vs Istirahat)
+        function setDuration(minutes) {
+            if (isRunning) {
+                if (!confirm("Ganti durasi akan mereset timer. Lanjutkan?")) return;
+                stopTimer();
+            }
+
+            initialDuration = minutes;
+            totalSeconds = minutes * 60;
+            
+            // 1. Update Waktu
+            updateDisplay();
+
+            // 2. Update Tampilan Tombol Aktif
+            document.getElementById('btn25').className = "px-5 py-2 rounded-xl text-sm font-bold border transition-colors bg-white text-slate-500 border-slate-200 hover:bg-slate-50";
+            document.getElementById('btn50').className = "px-5 py-2 rounded-xl text-sm font-bold border transition-colors bg-white text-slate-500 border-slate-200 hover:bg-slate-50";
+            document.getElementById('btn5').className  = "px-5 py-2 rounded-xl text-sm font-bold border transition-colors bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200";
+
+            if (minutes === 25) document.getElementById('btn25').className = "px-5 py-2 rounded-xl text-sm font-bold border transition-colors bg-slate-600 text-white border-slate-600";
+            else if (minutes === 50) document.getElementById('btn50').className = "px-5 py-2 rounded-xl text-sm font-bold border transition-colors bg-slate-600 text-white border-slate-600";
+            else if (minutes === 5) document.getElementById('btn5').className = "px-5 py-2 rounded-xl text-sm font-bold border transition-colors bg-amber-500 text-white border-amber-600 shadow-md";
+
+            // 3. Update Teks & Warna (Rest Mode Logic)
+            const title = document.getElementById('modeTitle');
+            const subtitle = document.getElementById('modeSubtitle');
+            const icon = document.getElementById('modeIcon');
+            const startBtn = document.getElementById('btnStart');
+
+            if (minutes === 5) {
+                // --- MODE ISTIRAHAT ---
+                title.innerText = "Mode Istirahat";
+                title.className = "text-2xl font-bold text-[#BC8F8F]";
+                subtitle.innerText = "Tarik napas, rilekskan pikiran sejenak.";
+                icon.innerText = "🛏️";
+                
+                // Ubah tombol start jadi oranye
+                startBtn.className = "w-full py-4 rounded-xl font-bold text-lg text-white mb-2 bg-amber-500 hover:bg-amber-600 transition-colors shadow-lg shadow-amber-100";
+            } else {
+                // --- FOCUS MODE ---
+                title.innerText = "Focus Mode";
+                title.className = "text-2xl font-bold text-slate-800";
+                subtitle.innerText = "Tetap fokus, jauhkan gangguan.";
+                icon.innerText = "🔥";
+
+                // Ubah tombol start jadi gelap (default)
+                startBtn.className = "w-full py-4 rounded-xl font-bold text-lg text-white mb-2 bg-slate-700 hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200";
+            }
+        }
+
+        function updateDisplay() {
+            const m = Math.floor(totalSeconds / 60);
+            const s = totalSeconds % 60;
+            const displayTime = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            
+            document.getElementById('timerDisplay').innerText = displayTime;
+            document.title = isRunning ? `(${displayTime}) focuSeen` : 'focuSeen - Dashboard';
+        }
+
+        function startTimer() {
+            if (isRunning) return;
+            
+            isRunning = true;
+            document.getElementById('btnStart').style.display = 'none';
+            document.getElementById('btnStop').style.display = 'block';
+
+            timerInterval = setInterval(() => {
+                totalSeconds--;
+                updateDisplay();
+
+                if (totalSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    finishSession();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            totalSeconds = initialDuration * 60;
+            updateDisplay();
+            
+            document.getElementById('btnStart').style.display = 'block';
+            document.getElementById('btnStop').style.display = 'none';
+            document.title = 'focuSeen - Dashboard';
+        }
+
+        function finishSession() {
+            alarmSound.play().catch(e => console.log("Audio play failed:", e));
+            saveSessionToDB();
+            isRunning = false;
+            document.getElementById('btnStart').style.display = 'block';
+            document.getElementById('btnStop').style.display = 'none';
+        }
+
+        function saveSessionToDB() {
+            if (initialDuration === 5) {
+                alert("Istirahat selesai! Kembali fokus yuk! 💪");
+                return;
+            }
+
+            fetch('/api/focus/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ minutes: initialDuration })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`🎉 Hebat! Anda fokus selama ${initialDuration} menit.`);
+                    location.reload(); 
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert("Sesi selesai (Offline Mode).");
+            });
+        }
+    </script>
+</body>
+</html>

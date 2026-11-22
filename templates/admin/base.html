@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Panel{% endblock %} - LYA & SAM</title>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">👑 ADMIN</div>
+            <div class="sidebar-subtitle">Panel Kontrol</div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="{{ url_for('admin_dashboard') }}" class="nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('admin_tugas') }}" class="nav-link {% if request.endpoint == 'admin_tugas' %}active{% endif %}">
+                    <i class="fas fa-tasks"></i> Tugas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('admin_matkul') }}" class="nav-link {% if request.endpoint == 'admin_matkul' %}active{% endif %}">
+                    <i class="fas fa-book"></i>
+                    <span>Kelola Mata Kuliah</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('admin_tim') }}" class="nav-link {% if request.endpoint == 'admin_tim' %}active{% endif %}">
+                    <i class="fas fa-users"></i>
+                    <span>Kelola Anggota Tim</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <h1>{% block page_title %}{% endblock %}</h1>
+            <div class="user-info">
+                <div class="user-avatar">{{ session.admin_username[0]|upper }}</div>
+                <span>{{ session.admin_username }}</span>
+                <form action="{{ url_for('admin_logout') }}" method="POST" style="margin: 0;">
+                    <button type="submit" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' if category == 'danger' else 'info-circle' }}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}{{ member.nama }} - Biodata{% endblock %}
+
+{% block navbar %}
+<div class="navbar">
+    <div class="logo">LYA & SAM</div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="biodata-container">
+    <div class="biodata-card">
+        <div class="biodata-header">
+            <div class="biodata-photo">
+            {% if member.foto %}
+            <img src="{{ url_for('static', filename='images/' + member.foto) }}" alt="{{ member.nama }}" class="biodata-photo-img">
+            {% else %}
+            {{ member.emoji }}
+            {% endif %}
+        </div>
+            <div class="biodata-name">{{ member.nama }}</div>
+            <div class="biodata-peran">{{ member.peran }}</div>
+        </div>
+        <div class="biodata-content">
+            <div class="biodata-section">
+                <div class="biodata-label">Nomor Induk Mahasiswa</div>
+                <div class="biodata-value">{{ member.nim }}</div>
+            </div>
+            <div class="biodata-section">
+                <div class="biodata-label">Email</div>
+                <div class="biodata-value">{{ member.email }}</div>
+            </div>
+            <div class="biodata-section">
+                <div class="biodata-label">Program Studi</div>
+                <div class="biodata-value">Sains Data</div>
+            </div>
+            <div class="biodata-section">
+                <div class="biodata-label">Semester</div>
+                <div class="biodata-value">3 (Tiga)</div>
+            </div>
+            <div class="biodata-section">
+                <div class="biodata-label">Peran dalam Kelompok</div>
+                <div class="biodata-value">{{ member.peran }}</div>
+            </div>
+            <a href="/" class="back-btn">← Kembali ke Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<style>
+.biodata-container {
+    min-height: 100vh;
+    padding: 120px 50px 50px;
+    background: #e8dcc4;
+}
+
+.biodata-card {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.biodata-header {
+    background: linear-gradient(135deg, #5C4033 0%, #8B7355 100%);
+    padding: 50px;
+    text-align: center;
+    position: relative;
+}
+
+.biodata-header::before {
+    content: '👨‍🎓';
+    position: absolute;
+    font-size: 150px;
+    opacity: 0.1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.biodata-photo {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 5px solid #e8dcc4;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    position: relative;
+    z-index: 2;
+    background: #d4a574;
+    font-size: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.biodata-photo-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.biodata-name {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: #e8dcc4;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 2;
+}
+
+.biodata-peran {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 16px;
+    color: #d4c4a8;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+    position: relative;
+    z-index: 2;
+}
+
+.biodata-content {
+    padding: 40px 50px;
+}
+
+.biodata-section {
+    margin-bottom: 30px;
+}
+
+.biodata-label {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 12px;
+    color: #8B7355;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.biodata-value {
+    font-size: 18px;
+    color: #5C4033;
+    font-weight: 500;
+    padding: 12px 0;
+    border-bottom: 2px solid #e8dcc4;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 25px;
+    background: #5C4033;
+    color: #e8dcc4;
+    text-decoration: none;
+    border-radius: 6px;
+    font-family: 'League Spartan', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    margin-top: 20px;
+}
+
+.back-btn:hover {
+    background: #704214;
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}
